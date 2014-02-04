@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Author</key>
+	<string>Oleg Shevchenko</string>
+	<key>Builder Version</key>
+	<string>9537.73.11</string>
+	<key>CFBundleDisplayName</key>
+	<string>Feedly Notifier</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.yourcompany.feedlynotifier</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1.0</string>
+	<key>Chrome</key>
+	<dict>
+		<key>Database Quota</key>
+		<real>1048576</real>
+		<key>Global Page</key>
+		<string>global.html</string>
+		<key>Menus</key>
+		<array>
+			<dict>
+				<key>Identifier</key>
+				<string>Context</string>
+				<key>Menu Items</key>
+				<array>
+					<dict>
+						<key>Checked State</key>
+						<real>0.0</real>
+						<key>Disabled</key>
+						<false/>
+						<key>Identifier</key>
+						<string>options</string>
+						<key>Image</key>
+						<string></string>
+						<key>Submenu</key>
+						<string></string>
+						<key>Title</key>
+						<string>Options</string>
+					</dict>
+				</array>
+			</dict>
+		</array>
+		<key>Popovers</key>
+		<array>
+			<dict>
+				<key>Filename</key>
+				<string>popup.html</string>
+				<key>Identifier</key>
+				<string>popup</string>
+			</dict>
+		</array>
+		<key>Toolbar Items</key>
+		<array>
+			<dict>
+				<key>Identifier</key>
+				<string>feedly-notifier</string>
+				<key>Image</key>
+				<string>images/icon.png</string>
+				<key>Label</key>
+				<string>Feedly Notifier</string>
+			</dict>
+		</array>
+	</dict>
+	<key>Content</key>
+	<dict>
+		<key>Scripts</key>
+		<dict/>
+	</dict>
+	<key>Description</key>
+	<string>Feedly notifier is a tiny extension that keeps you up to date with your feedly subscriptions.</string>
+	<key>ExtensionInfoDictionaryVersion</key>
+	<string>1.0</string>
+	<key>Permissions</key>
+	<dict>
+		<key>Website Access</key>
+		<dict/>
+	</dict>
+	<key>Website</key>
+	<string>https://github.com/olsh/Feedly-Notifier-Safari</string>
+</dict>
+</plist>

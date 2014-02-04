@@ -1,0 +1,128 @@
+{
+    "AbilitySaveFeeds": {
+        "message": "Возможность сохранять записи"
+    },
+    "AutoMarkRead": {
+        "message": "Помечать новость как прочитанную при открытии"
+    },
+    "Categories": {
+        "message": "Категории"
+    },
+    "CurrentUser": {
+        "message": "Текущий пользователь"
+    },
+    "Email": {
+        "message": "Email"
+    },
+    "EnableBackgroundMode": {
+        "message": "Включить фоновый режим"
+    },
+    "ExtensionDescription": {
+        "message": "Расширение для чтения новостных лент с Feedly"
+    },
+    "FeedlyNotifierOptions": {
+        "message": "Настройки Feedly Notifier"
+    },
+    "FeedlyWebsite": {
+        "message": "Сайт Feedly"
+    },
+    "Filters": {
+        "message": "Фильтры"
+    },
+    "ForceUpdateFeeds": {
+        "message": "Принудительно обновлять новости при открытии всплывающего окна"
+    },
+    "General": {
+        "message": "Общие"
+    },
+    "HideNotificationsAfter": {
+        "message": "Скрывать уведомления после (сек.), 0 - не скрывать"
+    },
+    "IntervalPeriod": {
+        "message": "Интервал проверки (мин.)"
+    },
+    "Login": {
+        "message": "Вход"
+    },
+    "Logout": {
+        "message": "Выйти"
+    },
+    "MarkAllAsRead": {
+        "message": "Пометить все как прочитанное"
+    },
+    "MarkAsRead": {
+        "message": "Пометить как прочитанное"
+    },
+    "MaxNotificationsCount": {
+        "message": "Максимальное количество уведомлений"
+    },
+    "MaxNumberOfFeeds": {
+        "message": "Максимальное количество новостей во всплывающем окне"
+    },
+    "More": {
+        "message": "Подробнее"
+    },
+    "NewFeeds": {
+        "message": "Новые записи"
+    },
+    "NoSavedArticles": {
+        "message": "Нет сохраненных записей"
+    },
+    "NoUnreadArticles": {
+        "message": "Нет непрочитанных новостей"
+    },
+    "Notifications": {
+        "message": "Уведомления"
+    },
+    "OldestFeedsFirst": {
+        "message": "Показывать старые записи первыми"
+    },
+    "OpenSiteOnIconClick": {
+        "message": "Открывать сайт Feedly по нажатию на иконку (не показывать всплывающее окно)"
+    },
+    "OptionsSaved": {
+        "message": "Настройки были сохранены"
+    },
+    "Popup": {
+        "message": "Всплывающее окно"
+    },
+    "PopupFontSize": {
+        "message": "Размер шрифта во всплывающем окне в процентах"
+    },
+    "ResetCounterOnClick": {
+        "message": "Сбрасывать счетчик при нажатии на иконку расширения"
+    },
+    "Save": {
+        "message": "Сохранить"
+    },
+    "ShowCategories": {
+        "message": "Показывать категории во всплывающем окне"
+    },
+    "ShowCounter": {
+        "message": "Показывать счетчик"
+    },
+    "ShowDesktopNotifications": {
+        "message": "Показывать уведомления"
+    },
+    "ShowFullFeedContent": {
+        "message": "Показывать полное содержание статьи при раскрытии новости (если возможно)"
+    },
+    "UpdateFollowingCategories": {
+        "message": "Обновлять только следующие категории"
+    },
+    "UseSecureConnection": {
+        "message": "Использовать защищенное соединение (https)"
+    },
+    "YouHaveNewFeeds": {
+        "message": "У вас $count$ новых записей",
+        "placeholders": {
+            "count": {
+                "content": "$1",
+                "example": "10 or many"
+            }
+        }
+    },
+    "many": {
+        "message": "много"
+    }
+}

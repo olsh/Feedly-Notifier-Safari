@@ -1,0 +1,128 @@
+﻿{
+    "AbilitySaveFeeds": {
+        "message": "Possibilitа di salvare i feed"
+    },
+    "AutoMarkRead": {
+        "message": "Segna il feed automaticamente come letto quando si visualizza la notizia"
+    },
+    "Categories": {
+        "message": "Categorie"
+    },
+    "CurrentUser": {
+        "message": "Utente corrente"
+    },
+    "Email": {
+        "message": "Email"
+    },
+    "EnableBackgroundMode": {
+        "message": "Enable background mode"
+    },
+    "ExtensionDescription": {
+        "message": "Estensione per Feedly news reader"
+    },
+    "FeedlyNotifierOptions": {
+        "message": "Opzioni di Feedly Notifier"
+    },
+    "FeedlyWebsite": {
+        "message": "Sito web di Feedly"
+    },
+    "Filters": {
+        "message": "Filtri"
+    },
+    "ForceUpdateFeeds": {
+        "message": "Forza l'aggiornamento dei feed all'apertura del popup"
+    },
+    "General": {
+        "message": "Generale"
+    },
+    "HideNotificationsAfter": {
+        "message": "Nascondi le notifiche desktop dopo (sec.), 0 - non le nasconde"
+    },
+    "IntervalPeriod": {
+        "message": "Periodo di intervallo (min.)"
+    },
+    "Login": {
+        "message": "Accedi"
+    },
+    "Logout": {
+        "message": "Esci"
+    },
+    "MarkAllAsRead": {
+        "message": "Segna tutti come giа letti"
+    },
+    "MarkAsRead": {
+        "message": "Segna come letto"
+    },
+    "MaxNotificationsCount": {
+        "message": "Numero massimo di notifiche per volta"
+    },
+    "MaxNumberOfFeeds": {
+        "message": "Massimo numero di feed visualizzabili nel popup"
+    },
+    "More": {
+        "message": "More"
+    },
+    "NewFeeds": {
+        "message": "Nuovi feed"
+    },
+    "NoSavedArticles": {
+        "message": "Nessun articolo salvato"
+    },
+    "NoUnreadArticles": {
+        "message": "Non ci sono articoli non letti"
+    },
+    "Notifications": {
+        "message": "Notifiche"
+    },
+    "OldestFeedsFirst": {
+        "message": "Mostra prima i feed più vecchi"
+    },
+    "OpenSiteOnIconClick": {
+        "message": "Apri il sito di Feedly con un clic sull'icona (non visualizza il popup)"
+    },
+    "OptionsSaved": {
+        "message": "Le opzioni sono state salvate"
+    },
+    "Popup": {
+        "message": "Popup"
+    },
+    "PopupFontSize": {
+        "message": "Popup font size in percent"
+    },
+    "ResetCounterOnClick": {
+        "message": "Reset counter when extension button clicked"
+    },
+    "Save": {
+        "message": "Salva"
+    },
+    "ShowCategories": {
+        "message": "Mostra categorie nel popup"
+    },
+    "ShowCounter": {
+        "message": "Mostra contatore"
+    },
+    "ShowDesktopNotifications": {
+        "message": "Mostra le notifiche desktop"
+    },
+    "ShowFullFeedContent": {
+        "message": "Mostra il contenuto completo dell'articolo quando si espande un feed (se possibile)"
+    },
+    "UpdateFollowingCategories": {
+        "message": "Aggiorna solo le seguenti categorie"
+    },
+    "UseSecureConnection": {
+        "message": "Utilizza una connessione sicura (https)"
+    },
+    "YouHaveNewFeeds": {
+        "message": "Ci sono $count$ nuovi feed",
+        "placeholders": {
+            "count": {
+                "content": "$1",
+                "example": "10 o piщ"
+            }
+        }
+    },
+    "many": {
+        "message": "numerosi"
+    }
+}

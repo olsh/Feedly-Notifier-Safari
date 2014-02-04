@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" type="text/css" href="styles/style.css"/>
+</head>
+<body>
+<div id="login">
+    <button id="login-btn" class="button">Login</button>
+</div>
+<div id="popup-content">
+    <div id="feedly">
+        <div id="feedly-section">
+        <img src="/images/icon.png"><a href="#" id="website"></a>
+        </div>
+        <div id="all-read-section">
+            <span id="update-feeds"><i class="icon-refresh"></i></span>
+            <i class="icon-ok"></i><span id="mark-all-read"></span>
+        </div>
+        <div class="clear"></div>
+        <button id="btn-feeds" class="tab active-tab">Feeds</button>
+        <button id="btn-feeds-saved" class="tab">Saved</button>
+    </div>
+    <div id="feed"></div>
+    <div id="feed-saved"></div>
+    <div id="feed-empty"></div>
+</div>
+<div id="loading">
+    <img src="/images/loading.gif" alt="loading...">
+</div>
+</body>
+
+<script src="scripts/jquery-2.0.3.min.js"></script>
+<script src="scripts/jquery.mustache.min.js"></script>
+<script id="feedTemplate" type="text/x-handlebars-template">
+    {{#feeds}}
+    <div class="item" data-id="{{id}}" data-categories="{{#categories}}{{encodedId}} {{/categories}}">
+        <span class="article-title {{titleDirection}}">
+            <a data-link="{{url}}" class="title">{{title}}</a>
+        </span>
+        <span class="article-menu">
+            <span class="save-feed {{#isSaved}} saved {{/isSaved}}" data-saved="{{isSaved}}"></span>
+            <span class="mark-read" title="Mark as read"></span>
+            <span class="show-content" title="Show content"></span>
+        </span>
+
+        <div class="blog-title {{blogTitleDirection}}">
+            <img class="blog-icon" src="{{blogIcon}}"/>
+            <a data-link="{{blogUrl}}" href="javascript:void(0)">{{blog}}</a>,
+            <span class="timeago" title="{{isoDate}}"></span>
+        </div>
+        <div class="content {{contentDirection}}"></div>
+    </div>
+    {{/feeds}}
+</script>
+<script type="text/x-handlebars-template" id="categories-template">
+    <div class="categories">
+        <span class="active">All</span>
+        {{#categories}}
+        <span data-id="{{encodedId}}">{{label}}</span>
+        {{/categories}}
+    </div>
+</script>
+<script src="scripts/timeago/jquery.timeago.js"></script>
+<script src="scripts/popup.js"></script>
+</html>
