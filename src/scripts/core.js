@@ -59,6 +59,7 @@ var appGlobal = {
         return "user/" + this.options.feedlyUserId + "/category/global.uncategorized";
     }
 };
+/*
 
 // #Event handlers
 chrome.runtime.onInstalled.addListener(function (details) {
@@ -80,25 +81,29 @@ chrome.storage.onChanged.addListener(function (changes, areaName) {
     }
     readOptions(callback);
 });
+*/
 
-chrome.runtime.onStartup.addListener(function () {
+readOptions();
+writeOptions(initialize);
+
+/*chrome.runtime.onStartup.addListener(function () {
     readOptions(initialize);
 });
 
-/* Listener for adding or removing feeds on the feedly website */
+*//* Listener for adding or removing feeds on the feedly website *//*
 chrome.webRequest.onCompleted.addListener(function (details) {
     if (details.method === "POST" || details.method === "DELETE") {
         updateCounter();
         updateFeeds();
     }
-}, {urls: ["*://*.feedly.com/v3/subscriptions*", "*://*.feedly.com/v3/markers?*ct=feedly.desktop*"]});
+}, {urls: ["*:/*//*.feedly.com/v3/subscriptions*", "*:/*//*.feedly.com/v3/markers?*ct=feedly.desktop*"]});
 
-/* Listener for adding or removing saved feeds */
+*//* Listener for adding or removing saved feeds *//*
 chrome.webRequest.onCompleted.addListener(function (details) {
     if (details.method === "PUT" || details.method === "DELETE") {
         updateSavedFeeds();
     }
-}, {urls: ["*://*.feedly.com/v3/tags*global.saved*"]});
+}, {urls: ["*:/*//*.feedly.com/v3/tags*global.saved*"]});
 
 chrome.browserAction.onClicked.addListener(function () {
     if (appGlobal.isLoggedIn) {
@@ -109,15 +114,15 @@ chrome.browserAction.onClicked.addListener(function () {
     } else {
         getAccessToken();
     }
-});
+});*/
 
 /* Initialization all parameters and run feeds check */
 function initialize() {
-    if (appGlobal.options.openSiteOnIconClick) {
+/*    if (appGlobal.options.openSiteOnIconClick) {
         chrome.browserAction.setPopup({popup: ""});
     } else {
         chrome.browserAction.setPopup({popup: "popup.html"});
-    }
+    }*/
     appGlobal.feedlyApiClient.accessToken = appGlobal.options.accessToken;
 
     startSchedule(appGlobal.options.updateInterval);
@@ -184,34 +189,17 @@ function sendDesktopNotification(feeds) {
     }
 }
 
-/* Opens new tab, if tab is being opened when no active window (i.e. background mode)
- * then creates new window and adds tab in the end of it
- * url for open
- * active when is true, then tab will be active */
+/* Opens new tab */
 function openUrlInNewTab(url, active) {
-    chrome.windows.getAll({}, function (windows) {
-        if (windows.length < 1) {
-            chrome.windows.create({focused: true}, function (window) {
-                chrome.tabs.create({url: url, active: active }, function (feedTab) {
-                });
-            });
-        } else {
-            chrome.tabs.create({url: url, active: active }, function (feedTab) {
-            });
-        }
-    });
+    var visibility = active ? "foreground" : "background";
+    var tab = safari.self.browserWindow.openTab(visibility);
+    tab.url = url;
 }
 
 /* Opens new Feedly tab, if tab was already opened, then switches on it and reload. */
 function openFeedlyTab() {
-    chrome.tabs.query({url: appGlobal.feedlyUrl + "/*"}, function (tabs) {
-        if (tabs.length < 1) {
-            chrome.tabs.create({url: appGlobal.feedlyUrl});
-        } else {
-            chrome.tabs.update(tabs[0].id, {active: true});
-            chrome.tabs.reload(tabs[0].id);
-        }
-    });
+    var tab = safari.self.browserWindow.openTab("foreground");
+    tab.url = appGlobal.feedlyUrl;
 }
 
 /* Removes feeds from cache by feed ID */
@@ -234,38 +222,36 @@ function removeFeedFromCache(feedId) {
  * The callback parameter should specify a function that looks like this:
  * function(object newFeeds) {...};*/
 function filterByNewFeeds(feeds, callback) {
-    chrome.storage.local.get("lastFeedTimeTicks", function (options) {
-        var lastFeedTime;
+    var lastFeedTimeTicks = localStorage.getItem("lastFeedTimeTicks");
+    var lastFeedTime;
 
-        if (options.lastFeedTimeTicks) {
-            lastFeedTime = new Date(options.lastFeedTimeTicks);
-        } else {
-            lastFeedTime = new Date(1971, 0, 1);
-        }
+    if (lastFeedTimeTicks) {
+        lastFeedTime = new Date(lastFeedTimeTicks);
+    } else {
+        lastFeedTime = new Date(1971, 0, 1);
+    }
 
-        var newFeeds = [];
-        var maxFeedTime = lastFeedTime;
+    var newFeeds = [];
+    var maxFeedTime = lastFeedTime;
 
-        for (var i = 0; i < feeds.length; i++) {
-            if (feeds[i].date > lastFeedTime) {
-                newFeeds.push(feeds[i]);
-                if (feeds[i].date > maxFeedTime) {
-                    maxFeedTime = feeds[i].date;
-                }
+    for (var i = 0; i < feeds.length; i++) {
+        if (feeds[i].date > lastFeedTime) {
+            newFeeds.push(feeds[i]);
+            if (feeds[i].date > maxFeedTime) {
+                maxFeedTime = feeds[i].date;
             }
         }
+    }
 
-        chrome.storage.local.set({ lastFeedTimeTicks: maxFeedTime.getTime() }, function () {
-            if (typeof callback === "function") {
-                callback(newFeeds);
-            }
-        });
-    });
+    localStorage.setItem("lastFeedTimeTicks", maxFeedTime.getTime());
+    if (typeof callback === "function") {
+        callback(newFeeds);
+    }
 }
 
 function resetCounter(){
     setBadgeCounter(0);
-    chrome.storage.local.set({ lastCounterResetTime: new Date().getTime() });
+    localStorage.setItem("lastCounterResetTime", new Date().getTime());
 }
 
 /* Update saved feeds and stores its in cache */
@@ -282,28 +268,23 @@ function updateSavedFeeds(callback) {
 
 /* Sets badge counter if unread feeds more than zero */
 function setBadgeCounter(unreadFeedsCount) {
-    if (appGlobal.options.showCounter) {
-        chrome.browserAction.setBadgeText({ text: String(+unreadFeedsCount > 0 ? unreadFeedsCount : "")});
-    } else {
-        chrome.browserAction.setBadgeText({ text: ""});
-    }
+    safari.extension.toolbarItems[0].badge = unreadFeedsCount;
 }
 
 /* Runs feeds update and stores unread feeds in cache
  * Callback will be started after function complete
  * */
 function updateCounter() {
-    if(appGlobal.options.resetCounterOnClick){
-        chrome.storage.local.get("lastCounterResetTime", function(options){
-            if (options.lastCounterResetTime){
-                var parameters = {
-                    newerThan: options.lastCounterResetTime
-                };
-            }
-            makeMarkersRequest(parameters);
-        });
+    if (appGlobal.options.resetCounterOnClick) {
+        var lastCounterResetTime = localStorage.getItem("lastCounterResetTime");
+        if (lastCounterResetTime) {
+            var parameters = {
+                newerThan: lastCounterResetTime
+            };
+        }
+        makeMarkersRequest(parameters);
     } else {
-        chrome.storage.local.set({ lastCounterResetTime: new Date(0).getTime() });
+        localStorage.setItem("lastCounterResetTime", new Date(0).getTime());
         makeMarkersRequest();
     }
 
@@ -425,9 +406,8 @@ function updateFeeds(callback, silentUpdate){
 
 /* Stops scheduler, sets badge as inactive and resets counter */
 function setInactiveStatus() {
-    chrome.browserAction.setIcon({ path: appGlobal.icons.inactive }, function () {
-    });
-    chrome.browserAction.setBadgeText({ text: ""});
+    safari.extension.toolbarItems[0].image = appGlobal.icons.inactive;
+    setBadgeCounter(0);
     appGlobal.cachedFeeds = [];
     appGlobal.isLoggedIn = false;
     appGlobal.options.feedlyUserId = "";
@@ -436,8 +416,7 @@ function setInactiveStatus() {
 
 /* Sets badge as active */
 function setActiveStatus() {
-    chrome.browserAction.setIcon({ path: appGlobal.icons.default }, function () {
-    });
+    safari.extension.toolbarItems[0].image = appGlobal.icons.default;
     appGlobal.isLoggedIn = true;
 }
 
@@ -579,13 +558,12 @@ function markAsRead(feedIds, callback) {
             for (var i = 0; i < feedIds.length; i++) {
                 removeFeedFromCache(feedIds[i]);
             }
-            chrome.browserAction.getBadgeText({}, function (feedsCount) {
+            var feedsCount = safari.extension.toolbarItems[0].badge;
                 feedsCount = +feedsCount;
                 if (feedsCount > 0) {
                     feedsCount -= feedIds.length;
                     setBadgeCounter(feedsCount);
                 }
-            });
             if (typeof callback === "function") {
                 callback(true);
             }
@@ -647,7 +625,7 @@ function toggleSavedFeed(feedId, saveFeed, callback) {
 }
 
 /* Runs authenticating a user process,
- * then read access token and stores in chrome.storage */
+ * then read access token and stores in web storage */
 function getAccessToken() {
     var state = (new Date()).getTime();
     var url = appGlobal.feedlyApiClient.getMethodUrl("auth/auth", {
@@ -658,41 +636,37 @@ function getAccessToken() {
         state: state
     }, appGlobal.options.useSecureConnection);
 
-    chrome.tabs.create({url: url}, function (authorizationTab) {
-        chrome.tabs.onUpdated.addListener(function processCode(tabId, information, tab) {
+    var tab = safari.self.browserWindow.openTab("foreground");
+    tab.url = url;
 
-            var checkStateRegex = new RegExp("state=" + state);
-            if (!checkStateRegex.test(information.url)) {
-                return;
-            }
+    var checkStateRegex = new RegExp("state=" + state);
+    if (!checkStateRegex.test(information.url)) {
+        return;
+    }
 
-            var codeParse = /code=(.+?)(?:&|$)/i;
-            var matches = codeParse.exec(information.url);
-            if (matches) {
-                appGlobal.feedlyApiClient.request("auth/token", {
-                    method: "POST",
-                    useSecureConnection: appGlobal.options.useSecureConnection,
-                    parameters: {
-                        code: matches[1],
-                        client_id: appGlobal.clientId,
-                        client_secret: appGlobal.clientSecret,
-                        redirect_uri: "http://localhost",
-                        grant_type: "authorization_code"
-                    },
-                    onSuccess: function (response) {
-                        chrome.storage.sync.set({
-                            accessToken: response.access_token,
-                            refreshToken: response.refresh_token,
-                            feedlyUserId: response.id
-                        }, function () {
-                        });
-                        chrome.tabs.onUpdated.removeListener(processCode);
-                        chrome.tabs.update(authorizationTab.id, {url: chrome.extension.getURL("options.html")});
-                    }
-                });
+    var codeParse = /code=(.+?)(?:&|$)/i;
+    var matches = codeParse.exec(information.url);
+    if (matches) {
+        appGlobal.feedlyApiClient.request("auth/token", {
+            method: "POST",
+            useSecureConnection: appGlobal.options.useSecureConnection,
+            parameters: {
+                code: matches[1],
+                client_id: appGlobal.clientId,
+                client_secret: appGlobal.clientSecret,
+                redirect_uri: "http://localhost",
+                grant_type: "authorization_code"
+            },
+            onSuccess: function (response) {
+                localStorage.setItem("accessToken", response.access_token);
+                localStorage.setItem("refreshToken", response.refresh_token);
+                localStorage.setItem("feedlyUserId", response.id);
+/*                tab.url =
+                chrome.tabs.update(authorizationTab.id, {url: chrome.extension.getURL("options.html")});*/
             }
         });
-    });
+    }
+
 }
 
 /* Tries refresh access token if possible */
@@ -709,10 +683,8 @@ function refreshAccessToken(){
             grant_type: "refresh_token"
         },
         onSuccess: function (response) {
-            chrome.storage.sync.set({
-                accessToken: response.access_token,
-                feedlyUserId: response.id
-            }, function () {});
+            localStorage.setItem("accessToken", response.access_token);
+            localStorage.setItem("feedlyUserId", response.id);
         },
         onComplete: function(){
             appGlobal.tokenIsRefreshing = false;
@@ -720,35 +692,35 @@ function refreshAccessToken(){
     });
 }
 
-/* Writes all application options in chrome storage and runs callback after it */
+/* Writes all application options in web storage and runs callback after it */
 function writeOptions(callback) {
     var options = {};
     for (var option in appGlobal.options) {
         options[option] = appGlobal.options[option];
     }
-    chrome.storage.sync.set(options, function () {
-        if (typeof callback === "function") {
-            callback();
-        }
-    });
+    localStorage.setItem("options", options);
+
+    if (typeof callback === "function") {
+        callback();
+    }
 }
 
-/* Reads all options from chrome storage and runs callback after it */
+/* Reads all options from web storage and runs callback after it */
 function readOptions(callback) {
-    chrome.storage.sync.get(null, function (options) {
-        for (var optionName in options) {
-            if (typeof appGlobal.options[optionName] === "boolean") {
-                appGlobal.options[optionName] = Boolean(options[optionName]);
-            } else if (typeof appGlobal.options[optionName] === "number") {
-                appGlobal.options[optionName] = Number(options[optionName]);
-            } else {
-                appGlobal.options[optionName] = options[optionName];
-            }
+    var options = localStorage.getItem("options");
+
+    for (var optionName in options) {
+        if (typeof appGlobal.options[optionName] === "boolean") {
+            appGlobal.options[optionName] = Boolean(options[optionName]);
+        } else if (typeof appGlobal.options[optionName] === "number") {
+            appGlobal.options[optionName] = Number(options[optionName]);
+        } else {
+            appGlobal.options[optionName] = options[optionName];
         }
-        if (typeof callback === "function") {
-            callback();
-        }
-    });
+    }
+    if (typeof callback === "function") {
+        callback();
+    }
 }
 
 function apiRequestWrapper(methodName, settings) {

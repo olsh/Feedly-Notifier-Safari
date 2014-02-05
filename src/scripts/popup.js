@@ -5,13 +5,11 @@ var popupGlobal = {
     supportedTimeAgoLocales: ["ru", "fr", "pt-BR", "it", "cs"],
     feeds: [],
     savedFeeds: [],
-    backgroundPage: chrome.extension.getBackgroundPage()
+    backgroundPage: safari.extension.globalPage.contentWindow
 };
 
 $(document).ready(function () {
     $("#feed, #feed-saved").css("font-size", popupGlobal.backgroundPage.appGlobal.options.popupFontSize / 100 + "em");
-    $("#website").text(chrome.i18n.getMessage("FeedlyWebsite"));
-    $("#mark-all-read").text(chrome.i18n.getMessage("MarkAllAsRead"));
 
     if (popupGlobal.backgroundPage.appGlobal.options.abilitySaveFeeds) {
         $("#popup-content").addClass("tabs");
@@ -36,12 +34,12 @@ $("#login").click(function () {
 $("#feed, #feed-saved").on("mousedown", "a", function (event) {
     var link = $(this);
     if (event.which === 1 || event.which === 2) {
-        var isActiveTab = !(event.ctrlKey || event.which === 2);
-        chrome.tabs.create({url: link.data("link"), active: isActiveTab }, function (feedTab) {
-            if (popupGlobal.backgroundPage.appGlobal.options.markReadOnClick === true && link.hasClass("title") === true && $("#feed").is(":visible")) {
-                markAsRead([link.closest(".item").data("id")]);
-            }
-        });
+        var visibility = !(event.ctrlKey || event.which === 2) ? "foreground" : "background";
+        var tab = safari.self.browserWindow.openTab(visibility);
+        tab.url = link.data("link");
+        if (popupGlobal.backgroundPage.appGlobal.options.markReadOnClick && link.hasClass("title") && $("#feed").is(":visible")) {
+            markAsRead([link.closest(".item").data("id")]);
+        }
     }
 });
 
@@ -238,13 +236,12 @@ function showLoader() {
 
 function showLogin() {
     $("body").children("div").hide();
-    $("#login-btn").text(chrome.i18n.getMessage("Login"));
     $("#login").show();
 }
 
 function showEmptyContent() {
     $("body").children("div").hide();
-    $("#popup-content").show().children("div").hide().filter("#feed-empty").text(chrome.i18n.getMessage("NoUnreadArticles")).show();
+    $("#popup-content").show().children("div").hide().filter("#feed-empty").text("No unread articles").show();
     $("#feedly").show().find("#all-read-section").hide();
 }
 
@@ -255,14 +252,14 @@ function showFeeds() {
     $("body").children("div").hide();
     $("#popup-content").show().children("div").hide().filter("#feed").show();
     $("#feedly").show().find("#all-read-section").show().children().show();
-    $(".mark-read").attr("title", chrome.i18n.getMessage("MarkAsRead"));
-    $(".show-content").attr("title", chrome.i18n.getMessage("More"));
+    $(".mark-read").attr("title", "Mark as read");
+    $(".show-content").attr("title", "More");
 }
 
 function showSavedFeeds() {
     $("body").children("div").hide();
     $("#popup-content").show().children("div").hide().filter("#feed-saved").show().find(".mark-read").hide();
-    $("#feed-saved").find(".show-content").attr("title", chrome.i18n.getMessage("More"));
+    $("#feed-saved").find(".show-content").attr("title", "More");
     $("#feedly").show().find("#all-read-section").children().hide().filter("#update-feeds").show();
 }
 
