@@ -1,14 +1,25 @@
 "use strict";
 
-var optionsGlobal = {
-    backgroundPage: safari.extension.globalPage.contentWindow
+var optionsPageGlobal = {
+    options: {}
 };
 
-$(document).ready(function () {
-    loadOptions();
-    loadUserCategories();
-    loadProfileData();
-});
+safari.self.tab.dispatchMessage("optionsLoaded");
+safari.self.addEventListener("message", handleMessage, false);
+
+function handleMessage (event){
+    switch (event.name){
+        case "options":
+            loadOptions(event.message);
+            break;
+        case "userCategories":
+            loadUserCategories(event.message);
+            break;
+        case "userProfile":
+            loadProfileData(event.message);
+            break;
+    }
+}
 
 $("body").on("click", "#save", function (e) {
     var form = document.getElementById("options");
@@ -19,9 +30,7 @@ $("body").on("click", "#save", function (e) {
 });
 
 $("body").on("click", "#logout", function () {
-    optionsGlobal.backgroundPage.appGlobal.options.accessToken = "";
-    optionsGlobal.backgroundPage.appGlobal.options.refreshToken = "";
-    optionsGlobal.backgroundPage.writeOptions(optionsGlobal.backgroundPage.initialize);
+    safari.self.tab.dispatchMessage("logout");
     $("#userInfo, #filters-settings").hide();
 });
 
@@ -39,48 +48,28 @@ $("#options").on("change", "input", function (e) {
     });
 });
 
-function loadProfileData() {
-    optionsGlobal.backgroundPage.apiRequestWrapper("profile", {
-        useSecureConnection: optionsGlobal.backgroundPage.appGlobal.options.useSecureConnection,
-        onSuccess: function (result) {
-            var userInfo = $("#userInfo");
-            userInfo.find("[data-locale-value]").each(function () {
-                var textBox = $(this);
-                var localValue = textBox.data("locale-value");
-                textBox.text(chrome.i18n.getMessage(localValue));
-            });
-            userInfo.show();
-            for (var profileData in result) {
-                userInfo.find("span[data-value-name='" + profileData + "']").text(result[profileData]);
-            }
-        },
-        onAuthorizationRequired: function () {
-            $("#userInfo, #filters-settings").hide();
+function loadProfileData(profileData) {
+    if (profileData) {
+        var userInfo = $("#userInfo");
+        for (var data in profileData) {
+            userInfo.find("span[data-value-name='" + data + "']").text(profileData[data]);
         }
+        userInfo.show();
+    } else {
+        $("#userInfo, #filters-settings").hide();
+    }
+}
+
+function loadUserCategories(categories){
+    categories.forEach(function (category) {
+        appendCategory(category);
     });
 }
 
-function loadUserCategories(){
-    optionsGlobal.backgroundPage.apiRequestWrapper("categories", {
-        onSuccess: function (result) {
-            result.forEach(function(element){
-                appendCategory(element.id, element.label);
-            });
-            appendCategory(chrome.extension.getBackgroundPage().appGlobal.globalUncategorized, "Uncategorized");
-            chrome.storage.sync.get("filters", function(items){
-                var filters = items.filters || [];
-                filters.forEach(function(id){
-                    $("#categories").find("input[data-id='" + id +"']").attr("checked", "checked");
-                });
-            });
-        }
-    });
-}
-
-function appendCategory(id, label){
+function appendCategory(category){
     var categories = $("#categories");
-    var label = $("<span class='label' />").text(label);
-    var checkbox = $("<input type='checkbox' />").attr("data-id", id);
+    var label = $("<span class='label' />").text(category.label);
+    var checkbox = $("<input type='checkbox' />").attr("data-id", category.id).prop("checked", category.checked);
     categories.append(label);
     categories.append(checkbox);
     categories.append("<br/>");
@@ -97,7 +86,7 @@ function parseFilters() {
 
 /* Save all option in the web storage */
 function saveOptions() {
-    var options = {};
+    var options = optionsPageGlobal.options || {};
     $("#options").find("input[data-option-name]").each(function (optionName, value) {
         var optionControl = $(value);
         var optionValue;
@@ -108,17 +97,16 @@ function saveOptions() {
         } else {
             optionValue = optionControl.val();
         }
-        options[optionControl.data("option-name")] = optionValue;
+        optionsPageGlobal.options[optionControl.data("option-name")] = optionValue;
     });
-    options.filters = parseFilters();
+    optionsPageGlobal.options.filters = parseFilters();
 
-    optionsGlobal.backgroundPage.writeOptions(optionsGlobal.backgroundPage.initialize);
+    safari.self.tab.dispatchMessage("optionsSaved", optionsPageGlobal.options);
     alert("Options have been saved!");
 }
 
-function loadOptions() {
+function loadOptions(currentOptions) {
     var optionsForm = $("#options");
-    var currentOptions = optionsGlobal.backgroundPage.appGlobal.options;
     for (var option in currentOptions) {
         var optionControl = optionsForm.find("input[data-option-name='" + option + "']");
         if (optionControl.attr("type") === "checkbox") {
@@ -127,11 +115,6 @@ function loadOptions() {
             optionControl.val(currentOptions[option]);
         }
     }
+    optionsPageGlobal.options = currentOptions;
     optionsForm.find("input").trigger("change");
-    $("#header").text(chrome.i18n.getMessage("FeedlyNotifierOptions"));
-    $("#options").find("[data-locale-value]").each(function () {
-        var textBox = $(this);
-        var localValue = textBox.data("locale-value");
-        textBox.text(chrome.i18n.getMessage(localValue));
-    });
 }

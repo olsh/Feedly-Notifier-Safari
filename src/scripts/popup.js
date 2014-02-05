@@ -284,7 +284,7 @@ function resizeWindows() {
     height = height > maxHeight ? maxHeight : height;
 
     //For fix bug with scroll on Mac
-    var margin = 2;
+    var margin = 4;
 
     safari.self.height = height;
     safari.self.width = width;

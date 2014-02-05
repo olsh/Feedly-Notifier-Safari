@@ -13,9 +13,8 @@ var appGlobal = {
         accessToken: "",
         refreshToken: "",
         showDesktopNotifications: true,
-        hideNotificationDelay: 10, //seconds
         showFullFeedContent: false,
-        maxNotificationsCount: 5,
+        maxNotificationsCount: 1, // Safari supports only 1 notification at once
         openSiteOnIconClick: false,
         feedlyUserId: "",
         abilitySaveFeeds: false,
@@ -37,8 +36,6 @@ var appGlobal = {
             return this._updateInterval = value;
         }
     },
-    //Names of options after changes of which scheduler will be initialized
-    criticalOptionNames: ["updateInterval", "accessToken", "showFullFeedContent", "openSiteOnIconClick", "maxNumberOfFeeds", "abilitySaveFeeds", "filters", "isFiltersEnabled", "showCounter", "oldestFeedsFirst", "resetCounterOnClick"],
     cachedFeeds: [],
     cachedSavedFeeds: [],
     isLoggedIn: false,
@@ -57,6 +54,12 @@ var appGlobal = {
     },
     get globalUncategorized(){
         return "user/" + this.options.feedlyUserId + "/category/global.uncategorized";
+    },
+    get toolbarButton() {
+        return safari.extension.toolbarItems[0];
+    },
+    get openFeedlyWebsiteCommand() {
+        return "open-feedly-website";
     }
 };
 
@@ -67,22 +70,46 @@ var appGlobal = {
     writeOptions(initialize);
 })();
 
-/*
-chrome.browserAction.onClicked.addListener(function () {
+/* Listeners */
+safari.application.addEventListener("message", function (event) {
+    switch (event.name) {
+        case "optionsLoaded" :
+            safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("options", appGlobal.options);
+            loadCategories();
+            loadProfileData();
+            break;
+        case "optionsSaved" :
+            appGlobal.options = event.message;
+            writeOptions(initialize);
+            break;
+        case "logout" :
+            logout();
+            break;
+    }
+}, false);
+
+safari.application.addEventListener("command", function (event) {
+    if (event.command !== appGlobal.openFeedlyWebsiteCommand){
+        return;
+    }
     if (appGlobal.isLoggedIn) {
         openFeedlyTab();
-        if(appGlobal.options.resetCounterOnClick){
+        if (appGlobal.options.resetCounterOnClick) {
             resetCounter();
         }
     } else {
         getAccessToken();
     }
-});*/
+}, false);
+
+safari.extension.settings.addEventListener("change", openOptionsPage, false);
 
 /* Initialization all parameters and run feeds check */
 function initialize() {
     if (appGlobal.options.openSiteOnIconClick) {
-        chrome.browserAction.setPopup({popup: ""});
+        appGlobal.toolbarButton.command = appGlobal.openFeedlyWebsiteCommand;
+    } else {
+        appGlobal.toolbarButton.command = "";
     }
     appGlobal.feedlyApiClient.accessToken = appGlobal.options.accessToken;
 
@@ -108,21 +135,30 @@ function stopSchedule() {
     appGlobal.intervalIds = [];
 }
 
+function logout() {
+    appGlobal.options.accessToken = "";
+    appGlobal.options.refreshToken = "";
+    writeOptions(initialize);
+}
+
 /* Sends desktop notifications */
 function sendDesktopNotification(feeds) {
     var notifications = [];
     //if notifications too many, then to show only count
     if (feeds.length > appGlobal.options.maxNotificationsCount) {
         //We can detect only limit count of new feeds at time, but actually count of feeds may be more
-        var count = feeds.length === appGlobal.options.maxNumberOfFeeds ? chrome.i18n.getMessage("many") : feeds.length.toString();
-        var notification = window.webkitNotifications.createNotification(
-            appGlobal.icons.defaultBig, chrome.i18n.getMessage("NewFeeds"), chrome.i18n.getMessage("YouHaveNewFeeds", count));
-        notification.show();
+        var count = feeds.length === appGlobal.options.maxNumberOfFeeds ? "many" : feeds.length.toString();
+        var notification = new Notification("New feeds", {
+            icon: safari.extension.baseURI + appGlobal.icons.defaultBig,
+            body: "You have " + count + " new feeds"
+        });
         notifications.push(notification);
     } else {
         for (var i = 0; i < feeds.length; i++) {
-            var notification = window.webkitNotifications.createNotification(
-                feeds[i].blogIcon, feeds[i].blog, feeds[i].title);
+            var notification = new Notification(feeds[i].blog, {
+                icon: feeds[i].blogIcon,
+                body: feeds[i].title
+            });
 
             //Open new tab on click and close notification
             notification.url = feeds[i].url;
@@ -135,18 +171,8 @@ function sendDesktopNotification(feeds) {
                     markAsRead([target.feedId]);
                 }
             };
-            notification.show();
             notifications.push(notification);
         }
-    }
-
-    //Hide notifications after delay
-    if (appGlobal.options.hideNotificationDelay > 0) {
-        setTimeout(function () {
-            for (i = 0; i < notifications.length; i++) {
-                notifications[i].cancel();
-            }
-        }, appGlobal.options.hideNotificationDelay * 1000);
     }
 }
 
@@ -161,6 +187,11 @@ function openUrlInNewTab(url, active) {
 function openFeedlyTab() {
     var tab = safari.application.activeBrowserWindow.openTab("foreground");
     tab.url = appGlobal.feedlyUrl;
+}
+
+function openOptionsPage () {
+    var tab = safari.application.activeBrowserWindow.openTab("foreground");
+    tab.url = safari.extension.baseURI + "options.html";
 }
 
 /* Removes feeds from cache by feed ID */
@@ -229,7 +260,7 @@ function updateSavedFeeds(callback) {
 
 /* Sets badge counter if unread feeds more than zero */
 function setBadgeCounter(unreadFeedsCount) {
-    safari.extension.toolbarItems[0].badge = unreadFeedsCount;
+    appGlobal.toolbarButton.badge = unreadFeedsCount;
 }
 
 /* Runs feeds update and stores unread feeds in cache
@@ -367,8 +398,7 @@ function updateFeeds(callback, silentUpdate){
 
 /* Stops scheduler, sets badge as inactive and resets counter */
 function setInactiveStatus() {
-    console.log("inactive", safari.extension.baseURI + appGlobal.icons.inactive);
-    safari.extension.toolbarItems[0].image = safari.extension.baseURI + appGlobal.icons.inactive;
+    appGlobal.toolbarButton.image = safari.extension.baseURI + appGlobal.icons.inactive;
     setBadgeCounter(0);
     appGlobal.cachedFeeds = [];
     appGlobal.isLoggedIn = false;
@@ -378,8 +408,7 @@ function setInactiveStatus() {
 
 /* Sets badge as active */
 function setActiveStatus() {
-    console.log("active", safari.extension.baseURI + appGlobal.icons.default);
-    safari.extension.toolbarItems[0].image = safari.extension.baseURI + appGlobal.icons.default;
+    appGlobal.toolbarButton.image = safari.extension.baseURI + appGlobal.icons.default;
     appGlobal.isLoggedIn = true;
 }
 
@@ -521,7 +550,7 @@ function markAsRead(feedIds, callback) {
             for (var i = 0; i < feedIds.length; i++) {
                 removeFeedFromCache(feedIds[i]);
             }
-            var feedsCount = safari.extension.toolbarItems[0].badge;
+            var feedsCount = appGlobal.toolbarButton.badge;
                 feedsCount = +feedsCount;
                 if (feedsCount > 0) {
                     feedsCount -= feedIds.length;
@@ -584,6 +613,36 @@ function toggleSavedFeed(feedId, saveFeed, callback) {
             appGlobal.cachedFeeds[i].isSaved = saveFeed;
             break;
         }
+    }
+}
+
+function loadCategories(){
+    apiRequestWrapper("categories", {
+        onSuccess: function (result) {
+            result.push({id: appGlobal.globalUncategorized, label: "Uncategorized"});
+            result.forEach(function(element){
+                if (appGlobal.options.filters.indexOf(element.id) !== -1){
+                    element.checked = true;
+                }
+            });
+            safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("userCategories", result);
+        }
+    });
+}
+
+function loadProfileData () {
+    apiRequestWrapper("profile", {
+        useSecureConnection: appGlobal.options.useSecureConnection,
+        onSuccess: function (result) {
+            sendProfileData(result);
+        },
+        onAuthorizationRequired: function () {
+            sendProfileData(null);
+        }
+    });
+
+    function sendProfileData (result) {
+        safari.application.activeBrowserWindow.activeTab.page.dispatchMessage("userProfile", result);
     }
 }
 
@@ -708,7 +767,6 @@ function apiRequestWrapper(methodName, settings) {
     var onAuthorizationRequired = settings.onAuthorizationRequired;
 
     settings.onAuthorizationRequired = function (accessToken) {
-        console.log("auth")
         if (appGlobal.isLoggedIn) {
             setInactiveStatus();
         }

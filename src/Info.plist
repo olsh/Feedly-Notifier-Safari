@@ -72,7 +72,9 @@
 			<string>All</string>
 		</dict>
 	</dict>
+	<key>Update Manifest URL</key>
+	<string>http://olsh.github.io/Feedly-Notifier/files/safari_update_manifest.plist</string>
 	<key>Website</key>
-	<string>https://github.com/olsh/Feedly-Notifier-Safari</string>
+	<string>http://olsh.github.io/Feedly-Notifier/</string>
 </dict>
 </plist>
