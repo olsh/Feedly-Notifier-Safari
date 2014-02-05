@@ -1,8 +1,6 @@
 "use strict";
 
 var popupGlobal = {
-    //Determines lists of supported jQuery.timeago localizations, default localization is en
-    supportedTimeAgoLocales: ["ru", "fr", "pt-BR", "it", "cs"],
     feeds: [],
     savedFeeds: [],
     backgroundPage: safari.extension.globalPage.contentWindow
@@ -15,16 +13,10 @@ $(document).ready(function () {
         $("#popup-content").addClass("tabs");
     }
 
-    //If we support this localization of timeago, then insert script with it
-    if (popupGlobal.supportedTimeAgoLocales.indexOf(window.navigator.language) !== -1) {
-        //Trying load localization for jQuery.timeago
-        $.getScript("/scripts/timeago/locales/jquery.timeago." + window.navigator.language + ".js", function () {
-            renderFeeds();
-        });
-    } else {
-        renderFeeds();
-    }
+    renderFeeds();
 });
+
+safari.application.addEventListener("popover", renderFeeds, true);
 
 $("#login").click(function () {
     popupGlobal.backgroundPage.getAccessToken();
@@ -34,9 +26,8 @@ $("#login").click(function () {
 $("#feed, #feed-saved").on("mousedown", "a", function (event) {
     var link = $(this);
     if (event.which === 1 || event.which === 2) {
-        var visibility = !(event.ctrlKey || event.which === 2) ? "foreground" : "background";
-        var tab = safari.self.browserWindow.openTab(visibility);
-        tab.url = link.data("link");
+        var isActive = !(event.ctrlKey || event.which === 2);
+        popupGlobal.backgroundPage.openUrlInNewTab(link.data("link"), isActive);
         if (popupGlobal.backgroundPage.appGlobal.options.markReadOnClick && link.hasClass("title") && $("#feed").is(":visible")) {
             markAsRead([link.closest(".item").data("id")]);
         }
@@ -194,6 +185,7 @@ function markAsRead(feedIds) {
 
     feedItems.fadeOut("fast", function(){
         $(this).remove();
+        resizeWindows();
     });
 
     feedItems.attr("data-is-read", "true");
@@ -232,17 +224,20 @@ function getUniqueCategories(feeds){
 function showLoader() {
     $("body").children("div").hide();
     $("#loading").show();
+    resizeWindows();
 }
 
 function showLogin() {
     $("body").children("div").hide();
     $("#login").show();
+    resizeWindows();
 }
 
 function showEmptyContent() {
     $("body").children("div").hide();
     $("#popup-content").show().children("div").hide().filter("#feed-empty").text("No unread articles").show();
     $("#feedly").show().find("#all-read-section").hide();
+    resizeWindows();
 }
 
 function showFeeds() {
@@ -254,6 +249,7 @@ function showFeeds() {
     $("#feedly").show().find("#all-read-section").show().children().show();
     $(".mark-read").attr("title", "Mark as read");
     $(".show-content").attr("title", "More");
+    resizeWindows();
 }
 
 function showSavedFeeds() {
@@ -261,6 +257,7 @@ function showSavedFeeds() {
     $("#popup-content").show().children("div").hide().filter("#feed-saved").show().find(".mark-read").hide();
     $("#feed-saved").find(".show-content").attr("title", "More");
     $("#feedly").show().find("#all-read-section").children().hide().filter("#update-feeds").show();
+    resizeWindows();
 }
 
 function setPopupExpand(isExpand){
@@ -272,4 +269,39 @@ function setPopupExpand(isExpand){
         $(".item").css("width", popupContent.hasClass("tabs") ? "380px" : "350px");
         $(".article-title, .blog-title").css("width", popupContent.hasClass("tabs") ? "325px" : "310px");
     }
+    resizeWindows();
+}
+
+function resizeWindows() {
+    var maxHeight = 600;
+    var body = $("body");
+    var width = body.outerWidth(true);
+    var height = body.outerHeight(true);
+    if (height > maxHeight) {
+        height = maxHeight;
+        width += getScrollbarWidth();
+    }
+    height = height > maxHeight ? maxHeight : height;
+
+    //For fix bug with scroll on Mac
+    var margin = 2;
+
+    safari.self.height = height;
+    safari.self.width = width;
+}
+
+function getScrollbarWidth() {
+    var div = document.createElement('div');
+
+    div.style.overflowY = 'scroll';
+    div.style.width =  '50px';
+    div.style.height = '50px';
+
+    div.style.visibility = 'hidden';
+
+    document.body.appendChild(div);
+    var scrollWidth = div.offsetWidth - div.clientWidth;
+    document.body.removeChild(div);
+
+    return scrollWidth;
 }

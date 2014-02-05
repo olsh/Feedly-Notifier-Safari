@@ -3,6 +3,12 @@
     src: url(opensanscondensed.woff) format('woff');
 }
 
+body {
+    background-color: white;
+    overflow-x: hidden;
+    display: inline-block;
+}
+
 .button {
     background-color: #6cc655;
     border: 1px solid rgba(0, 0, 0, 0.2);

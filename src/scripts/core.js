@@ -3,9 +3,9 @@
 var appGlobal = {
     feedlyApiClient: new FeedlyApiClient(),
     icons: {
-        default: "/images/icon.png",
-        inactive: "/images/icon_inactive.png",
-        defaultBig: "/images/icon128.png"
+        default: "images/icon.png",
+        inactive: "images/icon_inactive.png",
+        defaultBig: "images/icon128.png"
     },
     options: {
         _updateInterval: 10, //minutes
@@ -59,52 +59,15 @@ var appGlobal = {
         return "user/" + this.options.feedlyUserId + "/category/global.uncategorized";
     }
 };
+
+(function () {
+    // Read all options from the web storage
+    readOptions();
+    // Write default options to the web storage
+    writeOptions(initialize);
+})();
+
 /*
-
-// #Event handlers
-chrome.runtime.onInstalled.addListener(function (details) {
-    //Trying read old options (mostly access token) if possible
-    readOptions(function () {
-        //Write all options in chrome storage and initialize application
-        writeOptions(initialize);
-    });
-});
-
-chrome.storage.onChanged.addListener(function (changes, areaName) {
-    var callback;
-
-    for (var optionName in changes) {
-        if (appGlobal.criticalOptionNames.indexOf(optionName) !== -1) {
-            callback = initialize;
-            break;
-        }
-    }
-    readOptions(callback);
-});
-*/
-
-readOptions();
-writeOptions(initialize);
-
-/*chrome.runtime.onStartup.addListener(function () {
-    readOptions(initialize);
-});
-
-*//* Listener for adding or removing feeds on the feedly website *//*
-chrome.webRequest.onCompleted.addListener(function (details) {
-    if (details.method === "POST" || details.method === "DELETE") {
-        updateCounter();
-        updateFeeds();
-    }
-}, {urls: ["*:/*//*.feedly.com/v3/subscriptions*", "*:/*//*.feedly.com/v3/markers?*ct=feedly.desktop*"]});
-
-*//* Listener for adding or removing saved feeds *//*
-chrome.webRequest.onCompleted.addListener(function (details) {
-    if (details.method === "PUT" || details.method === "DELETE") {
-        updateSavedFeeds();
-    }
-}, {urls: ["*:/*//*.feedly.com/v3/tags*global.saved*"]});
-
 chrome.browserAction.onClicked.addListener(function () {
     if (appGlobal.isLoggedIn) {
         openFeedlyTab();
@@ -118,11 +81,9 @@ chrome.browserAction.onClicked.addListener(function () {
 
 /* Initialization all parameters and run feeds check */
 function initialize() {
-/*    if (appGlobal.options.openSiteOnIconClick) {
+    if (appGlobal.options.openSiteOnIconClick) {
         chrome.browserAction.setPopup({popup: ""});
-    } else {
-        chrome.browserAction.setPopup({popup: "popup.html"});
-    }*/
+    }
     appGlobal.feedlyApiClient.accessToken = appGlobal.options.accessToken;
 
     startSchedule(appGlobal.options.updateInterval);
@@ -192,13 +153,13 @@ function sendDesktopNotification(feeds) {
 /* Opens new tab */
 function openUrlInNewTab(url, active) {
     var visibility = active ? "foreground" : "background";
-    var tab = safari.self.browserWindow.openTab(visibility);
+    var tab = safari.application.activeBrowserWindow.openTab(visibility);
     tab.url = url;
 }
 
 /* Opens new Feedly tab, if tab was already opened, then switches on it and reload. */
 function openFeedlyTab() {
-    var tab = safari.self.browserWindow.openTab("foreground");
+    var tab = safari.application.activeBrowserWindow.openTab("foreground");
     tab.url = appGlobal.feedlyUrl;
 }
 
@@ -406,7 +367,8 @@ function updateFeeds(callback, silentUpdate){
 
 /* Stops scheduler, sets badge as inactive and resets counter */
 function setInactiveStatus() {
-    safari.extension.toolbarItems[0].image = appGlobal.icons.inactive;
+    console.log("inactive", safari.extension.baseURI + appGlobal.icons.inactive);
+    safari.extension.toolbarItems[0].image = safari.extension.baseURI + appGlobal.icons.inactive;
     setBadgeCounter(0);
     appGlobal.cachedFeeds = [];
     appGlobal.isLoggedIn = false;
@@ -416,7 +378,8 @@ function setInactiveStatus() {
 
 /* Sets badge as active */
 function setActiveStatus() {
-    safari.extension.toolbarItems[0].image = appGlobal.icons.default;
+    console.log("active", safari.extension.baseURI + appGlobal.icons.default);
+    safari.extension.toolbarItems[0].image = safari.extension.baseURI + appGlobal.icons.default;
     appGlobal.isLoggedIn = true;
 }
 
@@ -636,35 +599,42 @@ function getAccessToken() {
         state: state
     }, appGlobal.options.useSecureConnection);
 
-    var tab = safari.self.browserWindow.openTab("foreground");
+    var tab = safari.application.activeBrowserWindow.openTab();
     tab.url = url;
 
-    var checkStateRegex = new RegExp("state=" + state);
-    if (!checkStateRegex.test(information.url)) {
-        return;
-    }
+    safari.application.addEventListener("beforeNavigate", requestTokenHandler, true);
 
-    var codeParse = /code=(.+?)(?:&|$)/i;
-    var matches = codeParse.exec(information.url);
-    if (matches) {
-        appGlobal.feedlyApiClient.request("auth/token", {
-            method: "POST",
-            useSecureConnection: appGlobal.options.useSecureConnection,
-            parameters: {
-                code: matches[1],
-                client_id: appGlobal.clientId,
-                client_secret: appGlobal.clientSecret,
-                redirect_uri: "http://localhost",
-                grant_type: "authorization_code"
-            },
-            onSuccess: function (response) {
-                localStorage.setItem("accessToken", response.access_token);
-                localStorage.setItem("refreshToken", response.refresh_token);
-                localStorage.setItem("feedlyUserId", response.id);
-/*                tab.url =
-                chrome.tabs.update(authorizationTab.id, {url: chrome.extension.getURL("options.html")});*/
-            }
-        });
+    function requestTokenHandler (event) {
+
+        var checkStateRegex = new RegExp("state=" + state);
+        if (!checkStateRegex.test(event.url)) {
+            return;
+        }
+
+        var codeParse = /code=(.+?)(?:&|$)/i;
+        var matches = codeParse.exec(event.url);
+        if (matches) {
+            appGlobal.feedlyApiClient.request("auth/token", {
+                method: "POST",
+                useSecureConnection: appGlobal.options.useSecureConnection,
+                parameters: {
+                    code: matches[1],
+                    client_id: appGlobal.clientId,
+                    client_secret: appGlobal.clientSecret,
+                    redirect_uri: "http://localhost",
+                    grant_type: "authorization_code"
+                },
+                onSuccess: function (response) {
+                    appGlobal.options.accessToken = response.access_token;
+                    appGlobal.options.refreshToken = response.refresh_token;
+                    appGlobal.options.feedlyUserId = response.id;
+                    localStorage.setItem("options", appGlobal.options);
+                    writeOptions(initialize);
+                    safari.application.removeEventListener("beforeNavigate", requestTokenHandler, true);
+                    tab.url = safari.extension.baseURI + "options.html";
+                }
+            });
+        }
     }
 
 }
@@ -683,8 +653,9 @@ function refreshAccessToken(){
             grant_type: "refresh_token"
         },
         onSuccess: function (response) {
-            localStorage.setItem("accessToken", response.access_token);
-            localStorage.setItem("feedlyUserId", response.id);
+            appGlobal.options.accessToken = response.access_token;
+            appGlobal.options.feedlyUserId = response.id;
+            writeOptions(initialize);
         },
         onComplete: function(){
             appGlobal.tokenIsRefreshing = false;
@@ -694,11 +665,7 @@ function refreshAccessToken(){
 
 /* Writes all application options in web storage and runs callback after it */
 function writeOptions(callback) {
-    var options = {};
-    for (var option in appGlobal.options) {
-        options[option] = appGlobal.options[option];
-    }
-    localStorage.setItem("options", options);
+    localStorage.setItem("options", JSON.stringify(appGlobal.options));
 
     if (typeof callback === "function") {
         callback();
@@ -707,7 +674,13 @@ function writeOptions(callback) {
 
 /* Reads all options from web storage and runs callback after it */
 function readOptions(callback) {
-    var options = localStorage.getItem("options");
+    var options;
+    try {
+        options = JSON.parse(localStorage.getItem("options"));
+    }
+    catch (exception){
+        options = {};
+    }
 
     for (var optionName in options) {
         if (typeof appGlobal.options[optionName] === "boolean") {
@@ -735,6 +708,7 @@ function apiRequestWrapper(methodName, settings) {
     var onAuthorizationRequired = settings.onAuthorizationRequired;
 
     settings.onAuthorizationRequired = function (accessToken) {
+        console.log("auth")
         if (appGlobal.isLoggedIn) {
             setInactiveStatus();
         }

@@ -1,9 +1,7 @@
 "use strict";
 
 var optionsGlobal = {
-    backgroundPermission: {
-        permissions: ["background"]
-    }
+    backgroundPage: safari.extension.globalPage.contentWindow
 };
 
 $(document).ready(function () {
@@ -21,9 +19,9 @@ $("body").on("click", "#save", function (e) {
 });
 
 $("body").on("click", "#logout", function () {
-    chrome.extension.getBackgroundPage().appGlobal.options.accessToken = "";
-    chrome.extension.getBackgroundPage().appGlobal.options.refreshToken = "";
-    chrome.storage.sync.remove(["accessToken", "refreshToken"], function () {});
+    optionsGlobal.backgroundPage.appGlobal.options.accessToken = "";
+    optionsGlobal.backgroundPage.appGlobal.options.refreshToken = "";
+    optionsGlobal.backgroundPage.writeOptions(optionsGlobal.backgroundPage.initialize);
     $("#userInfo, #filters-settings").hide();
 });
 
@@ -42,8 +40,8 @@ $("#options").on("change", "input", function (e) {
 });
 
 function loadProfileData() {
-    chrome.extension.getBackgroundPage().apiRequestWrapper("profile", {
-        useSecureConnection: chrome.extension.getBackgroundPage().appGlobal.options.useSecureConnection,
+    optionsGlobal.backgroundPage.apiRequestWrapper("profile", {
+        useSecureConnection: optionsGlobal.backgroundPage.appGlobal.options.useSecureConnection,
         onSuccess: function (result) {
             var userInfo = $("#userInfo");
             userInfo.find("[data-locale-value]").each(function () {
@@ -63,7 +61,7 @@ function loadProfileData() {
 }
 
 function loadUserCategories(){
-    chrome.extension.getBackgroundPage().apiRequestWrapper("categories", {
+    optionsGlobal.backgroundPage.apiRequestWrapper("categories", {
         onSuccess: function (result) {
             result.forEach(function(element){
                 appendCategory(element.id, element.label);
@@ -97,7 +95,7 @@ function parseFilters() {
     return filters;
 }
 
-/* Save all option in the chrome storage */
+/* Save all option in the web storage */
 function saveOptions() {
     var options = {};
     $("#options").find("input[data-option-name]").each(function (optionName, value) {
@@ -114,44 +112,26 @@ function saveOptions() {
     });
     options.filters = parseFilters();
 
-    setBackgroundMode($("#enable-background-mode").is(":checked"));
-
-    chrome.storage.sync.set(options, function () {
-        alert(chrome.i18n.getMessage("OptionsSaved"));
-    });
+    optionsGlobal.backgroundPage.writeOptions(optionsGlobal.backgroundPage.initialize);
+    alert("Options have been saved!");
 }
 
 function loadOptions() {
-    chrome.permissions.contains(optionsGlobal.backgroundPermission, function (enabled){
-        $("#enable-background-mode").prop("checked", enabled);
-    });
-
-    chrome.storage.sync.get(null, function (items) {
-        var optionsForm = $("#options");
-        for (var option in items) {
-            var optionControl = optionsForm.find("input[data-option-name='" + option + "']");
-            if (optionControl.attr("type") === "checkbox") {
-                optionControl.attr("checked", items[option]);
-            } else {
-                optionControl.val(items[option]);
-            }
+    var optionsForm = $("#options");
+    var currentOptions = optionsGlobal.backgroundPage.appGlobal.options;
+    for (var option in currentOptions) {
+        var optionControl = optionsForm.find("input[data-option-name='" + option + "']");
+        if (optionControl.attr("type") === "checkbox") {
+            optionControl.attr("checked", currentOptions[option]);
+        } else {
+            optionControl.val(currentOptions[option]);
         }
-        optionsForm.find("input").trigger("change");
-    });
+    }
+    optionsForm.find("input").trigger("change");
     $("#header").text(chrome.i18n.getMessage("FeedlyNotifierOptions"));
     $("#options").find("[data-locale-value]").each(function () {
         var textBox = $(this);
         var localValue = textBox.data("locale-value");
         textBox.text(chrome.i18n.getMessage(localValue));
     });
-}
-
-function setBackgroundMode(enable) {
-    if (enable) {
-        chrome.permissions.request(optionsGlobal.backgroundPermission, function () {
-        });
-    } else {
-        chrome.permissions.remove(optionsGlobal.backgroundPermission, function () {
-        });
-    }
 }

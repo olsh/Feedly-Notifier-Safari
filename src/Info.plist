@@ -41,7 +41,7 @@
 				<key>Identifier</key>
 				<string>feedly-notifier</string>
 				<key>Image</key>
-				<string>images/icon.png</string>
+				<string>images/icon_inactive.png</string>
 				<key>Include By Default</key>
 				<true/>
 				<key>Label</key>
