@@ -6,17 +6,17 @@ var popupGlobal = {
     backgroundPage: safari.extension.globalPage.contentWindow
 };
 
-$(document).ready(function () {
+safari.application.addEventListener("popover", function () {
     $("#feed, #feed-saved").css("font-size", popupGlobal.backgroundPage.appGlobal.options.popupFontSize / 100 + "em");
 
     if (popupGlobal.backgroundPage.appGlobal.options.abilitySaveFeeds) {
         $("#popup-content").addClass("tabs");
+    } else {
+        $("#popup-content").removeClass("tabs");
     }
 
     renderFeeds();
-});
-
-safari.application.addEventListener("popover", renderFeeds, true);
+}, true);
 
 $("#login").click(function () {
     popupGlobal.backgroundPage.getAccessToken();
