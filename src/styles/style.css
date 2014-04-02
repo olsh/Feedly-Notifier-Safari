@@ -40,12 +40,18 @@ body {
 }
 
 .icon-ok {
-    background-position: -288px 0;
+    background-position: -285px 2px;
+    margin-right: 5px;
+}
+
+.icon-share {
+    background-position: -117px -69px;
     margin-right: 5px;
 }
 
 .icon-refresh {
-    background-position: -240px -24px;
+    background-position: -237px -21px;
+    margin-right: 5px;
 }
 
 .mark-read:hover {
@@ -64,7 +70,7 @@ body {
     background-position: -14px 0;
 }
 
-#login, #popup-content, #all-read-section {
+#login, #popup-content, #popup-actions {
     display: none;
 }
 
@@ -163,11 +169,11 @@ body {
     border-bottom: 1px solid #6cc655;
 }
 
-#feedly > button {
+#tabs-container {
     display: none;
 }
 
-.tabs #feedly > button {
+.tabs #tabs-container {
     display: inline;
 }
 
@@ -176,36 +182,94 @@ body {
     vertical-align: bottom;
 }
 
-#feed,
-#feed-saved,
-#feed-empty {
+#feed{
+    margin-top: 60px;
+}
+
+#feed-empty{
     margin-top: 40px;
 }
 
 .tabs #feed,
 .tabs #feed-saved,
-.tabs #feed-empty {
-    margin-top: 80px;
+.tabs #feed-empty
+{
+    margin-top: 90px;
+}
+
+.arrow-up {
+    display: none;
+    width: 0;
+    height: 0;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-bottom: 4px solid #6cc655;
+    position: absolute;
+    top: 36px;
+    right: 1px
 }
 
 #website,
-#mark-all-read {
+#popup-actions {
     font-family: sans-serif;
     font-size: 11px;
     text-decoration: none;
     color: black;
 }
 
-#mark-all-read {
+#popup-actions > i > span {
+    display: none;
+}
+
+#popup-actions > i {
     cursor: pointer;
+    border: 1px solid #6cc655;
+    border-radius: 3px;
+    padding: 3px;
+}
+
+#popup-actions > i:hover{
+    background-color: #eaeaea;
+}
+
+#popup-actions > i:hover > span {
+    display: inline-block;
+    position: absolute;
+    top: 40px;
+    right: 0;
+    border-top: 1px solid #6cc655;
+    min-width: 100px;
+    text-align: right;
+}
+
+#popup-actions > i:hover > div {
+    display: inline-block;
+}
+
+#website:hover {
+    color: #6cc655;
 }
 
 #feedly-section {
     float: left;
 }
 
-#all-read-section {
+#popup-actions {
     float: right;
+    height: 37px;
+    padding-right: 5px;
+}
+
+#popup-actions > div {
+    margin-bottom: 5px;
+}
+
+#popup-actions span {
+    cursor: pointer;
+}
+
+#popup-actions span:hover {
+    color: #6cc655;
 }
 
 .title {

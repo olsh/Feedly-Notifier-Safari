@@ -6,17 +6,7 @@ var popupGlobal = {
     backgroundPage: safari.extension.globalPage.contentWindow
 };
 
-safari.application.addEventListener("popover", function () {
-    $("#feed, #feed-saved").css("font-size", popupGlobal.backgroundPage.appGlobal.options.popupFontSize / 100 + "em");
-
-    if (popupGlobal.backgroundPage.appGlobal.options.abilitySaveFeeds) {
-        $("#popup-content").addClass("tabs");
-    } else {
-        $("#popup-content").removeClass("tabs");
-    }
-
-    renderFeeds();
-}, true);
+safari.application.addEventListener("popover", loadPopup, true);
 
 $("#login").click(function () {
     popupGlobal.backgroundPage.getAccessToken();
@@ -34,12 +24,16 @@ $("#feed, #feed-saved").on("mousedown", "a", function (event) {
     }
 });
 
-$("#popup-content").on("click", "#mark-all-read", function (event) {
-    var feedIds = [];
-    $(".item:visible").each(function (key, value) {
-        feedIds.push($(value).data("id"));
+$("#popup-content").on("click", "#mark-all-read", markAllAsRead);
+
+$("#popup-content").on("click", "#open-all-news", function () {
+    $("#feed").find("a.title[data-link]").filter(":visible").each(function (key, value) {
+        var news = $(value);
+        popupGlobal.backgroundPage.openUrlInNewTab(news.data("link"), false);
     });
-    markAsRead(feedIds);
+    if (popupGlobal.backgroundPage.appGlobal.options.markReadOnClick) {
+        markAllAsRead();
+    }
 });
 
 $("#feed").on("click", ".mark-read", function (event) {
@@ -129,6 +123,25 @@ $("#popup-content").on("click", ".categories > span", function (){
     }
 });
 
+$("#feedly").on("click", "#feedly-logo", function (event) {
+    if (event.which = 1) {
+        popupGlobal.backgroundPage.appGlobal.options.abilitySaveFeeds = !popupGlobal.backgroundPage.appGlobal.options.abilitySaveFeeds;
+        loadPopup();
+    }
+});
+
+function loadPopup() {
+    $("#feed, #feed-saved").css("font-size", popupGlobal.backgroundPage.appGlobal.options.popupFontSize / 100 + "em");
+
+    if (popupGlobal.backgroundPage.appGlobal.options.abilitySaveFeeds) {
+        $("#popup-content").addClass("tabs");
+    } else {
+        $("#popup-content").removeClass("tabs");
+    }
+
+    renderFeeds();
+}
+
 function renderFeeds(forceUpdate) {
     showLoader();
     popupGlobal.backgroundPage.getFeeds(popupGlobal.backgroundPage.appGlobal.options.forceUpdateFeeds || forceUpdate, function (feeds, isLoggedIn) {
@@ -194,11 +207,19 @@ function markAsRead(feedIds) {
     if ($("#feed").find(".item[data-is-read!='true']").size() === 0) {
         showLoader();
     }
-    popupGlobal.backgroundPage.markAsRead(feedIds, function (isLoggedIn) {
+    popupGlobal.backgroundPage.markAsRead(feedIds, function () {
         if ($("#feed").find(".item[data-is-read!='true']").size() === 0) {
             renderFeeds();
         }
     });
+}
+
+function markAllAsRead() {
+    var feedIds = [];
+    $(".item:visible").each(function (key, value) {
+        feedIds.push($(value).data("id"));
+    });
+    markAsRead(feedIds);
 }
 
 function renderCategories(container, feeds){
@@ -236,7 +257,7 @@ function showLogin() {
 function showEmptyContent() {
     $("body").children("div").hide();
     $("#popup-content").show().children("div").hide().filter("#feed-empty").text("No unread articles").show();
-    $("#feedly").show().find("#all-read-section").hide();
+    $("#feedly").show().find("#popup-actions").hide();
     resizeWindows();
 }
 
@@ -246,7 +267,7 @@ function showFeeds() {
     }
     $("body").children("div").hide();
     $("#popup-content").show().children("div").hide().filter("#feed").show();
-    $("#feedly").show().find("#all-read-section").show().children().show();
+    $("#feedly").show().find("#popup-actions").show().children().show();
     $(".mark-read").attr("title", "Mark as read");
     $(".show-content").attr("title", "More");
     resizeWindows();
@@ -256,7 +277,7 @@ function showSavedFeeds() {
     $("body").children("div").hide();
     $("#popup-content").show().children("div").hide().filter("#feed-saved").show().find(".mark-read").hide();
     $("#feed-saved").find(".show-content").attr("title", "More");
-    $("#feedly").show().find("#all-read-section").children().hide().filter("#update-feeds").show();
+    $("#feedly").show().find("#popup-actions").show().children().hide().first().show();
     resizeWindows();
 }
 
