@@ -5,7 +5,7 @@
 	<key>Author</key>
 	<string>Oleg Shevchenko</string>
 	<key>Builder Version</key>
-	<string>9537.73.11</string>
+	<string>9537.74.9</string>
 	<key>CFBundleDisplayName</key>
 	<string>Feedly Notifier</string>
 	<key>CFBundleIdentifier</key>
@@ -13,9 +13,9 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.1.0</string>
+	<string>1.1.1</string>
 	<key>CFBundleVersion</key>
-	<string>1.1.0</string>
+	<string>1.1.1</string>
 	<key>Chrome</key>
 	<dict>
 		<key>Database Quota</key>

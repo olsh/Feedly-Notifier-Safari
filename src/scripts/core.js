@@ -382,12 +382,9 @@ function updateFeeds(callback, silentUpdate){
                             sendDesktopNotification(newFeeds);
                         }
                     });
-                    if (typeof callback === "function") {
-                        callback();
-                    }
                 }
             },
-            onAuthorizationRequired: function () {
+            onComplete: function () {
                 if (typeof callback === "function") {
                     callback();
                 }
