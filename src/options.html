@@ -40,6 +40,9 @@
                 <span class="label">Open Feedly site on icon click (don't show popup)</span>
                 <input type="checkbox" data-option-name="openSiteOnIconClick" /><br>
 
+                <span class="label">Open feeds in background tab</span>
+                <input type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="openFeedsInBackground" /><br>
+
                 <span class="label">Ability to save feeds</span>
                 <input type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="abilitySaveFeeds" /><br>
 
@@ -51,6 +54,12 @@
 
                 <span class="label">Popup font size in percent</span>
                 <input type="number" data-disable-parent="openSiteOnIconClick" min="70" max="150" data-option-name="popupFontSize" /><br>
+
+                <span class="label">Popup width</span>
+                <input type="number" data-disable-parent="openSiteOnIconClick" min="380" max="2000" data-option-name="popupWidth" /><br>
+
+                <span class="label">Expanded popup width</span>
+                <input type="number" data-disable-parent="openSiteOnIconClick" min="380" max="2000" data-option-name="expandedPopupWidth" /><br>
 
                 <span class="label">Show full content of article in the expanded feed (if possible)</span>
                 <input type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="showFullFeedContent" /><br>

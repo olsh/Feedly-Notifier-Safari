@@ -75,7 +75,7 @@ body {
 }
 
 .item {
-    width: 350px;
+    width: 100%;
     padding: 2px 0 2px 0;
 }
 
@@ -86,10 +86,6 @@ body {
 #feed .item:not(:last-child),
 #feed-saved .item:not(:last-child) {
     border-bottom: solid #d2d2d2 1px;
-}
-
-.tabs .item {
-    width: 380px;
 }
 
 .item .content {
@@ -139,12 +135,12 @@ body {
 
 .article-title,
 .blog-title {
-    width: 310px;
+    width: calc(100% - 45px);
 }
 
 .tabs .article-title,
 .tabs .blog-title {
-    width: 325px;
+    width: calc(100% - 55px);
 }
 
 .article-menu {
