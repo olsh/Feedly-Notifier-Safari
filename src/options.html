@@ -21,69 +21,69 @@
         <form id="options">
             <div class="options-section">
                 <h3>General</h3>
-                <span class="label">Interval period (min.)</span>:
-                <input type="number" min="10" max="120" data-option-name="updateInterval" /><br>
+                <label for="updateInterval" class="label">Interval period (min.)</label>:
+                <input id="updateInterval" type="number" min="10" max="120" data-option-name="updateInterval" /><br>
 
-                <span class="label">Auto mark as read on news open</span>
-                <input type="checkbox" data-option-name="markReadOnClick" /><br>
+                <label for="markReadOnClick" class="label">Auto mark as read on news open</label>
+                <input id="markReadOnClick" type="checkbox" data-option-name="markReadOnClick" /><br>
 
-                <span class="label">Show counter</span>
-                <input type="checkbox" data-option-name="showCounter" /><br>
+                <label for="showCounter" class="label">Show counter</label>
+                <input id="showCounter" type="checkbox" data-option-name="showCounter" /><br>
 
-                <span class="label">Reset counter when extension button clicked</span>
-                <input type="checkbox" data-enable-parent="showCounter" data-option-name="resetCounterOnClick" /><br>
+                <label for="resetCounterOnClick" class="label">Reset counter when extension button clicked</label>
+                <input id="resetCounterOnClick" type="checkbox" data-enable-parent="showCounter" data-option-name="resetCounterOnClick" /><br>
 
-                <span class="label">Use secure connection (https)</span>
-                <input type="checkbox" data-option-name="useSecureConnection" /><br>
+                <label for="useSecureConnection" class="label">Use secure connection (https)</label>
+                <input id="useSecureConnection" type="checkbox" data-option-name="useSecureConnection" /><br>
 
                 <h3>Popup</h3>
-                <span class="label">Open Feedly site on icon click (don't show popup)</span>
-                <input type="checkbox" data-option-name="openSiteOnIconClick" /><br>
+                <label for="openSiteOnIconClick" class="label">Open Feedly site on icon click (don't show popup)</label>
+                <input id="openSiteOnIconClick" type="checkbox" data-option-name="openSiteOnIconClick" /><br>
 
-                <span class="label">Open feeds in background tab</span>
-                <input type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="openFeedsInBackground" /><br>
+                <label for="openFeedsInBackground" class="label">Open feeds in background tab</label>
+                <input id="openFeedsInBackground" type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="openFeedsInBackground" /><br>
 
-                <span class="label">Ability to save feeds</span>
-                <input type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="abilitySaveFeeds" /><br>
+                <label for="abilitySaveFeeds" class="label">Ability to save feeds</label>
+                <input id="abilitySaveFeeds" type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="abilitySaveFeeds" /><br>
 
-                <span class="label">Max number of feeds in the popup</span>
-                <input type="number" data-disable-parent="openSiteOnIconClick" min="1" max="60" data-option-name="maxNumberOfFeeds" /><br>
+                <label for="maxNumberOfFeeds" class="label">Max number of feeds in the popup</label>
+                <input id="maxNumberOfFeeds" type="number" data-disable-parent="openSiteOnIconClick" min="1" max="60" data-option-name="maxNumberOfFeeds" /><br>
 
-                <span class="label">Oldest feeds first</span>
-                <input type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="oldestFeedsFirst" /><br>
+                <label for="oldestFeedsFirst" class="label">Oldest feeds first</label>
+                <input id="oldestFeedsFirst" type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="oldestFeedsFirst" /><br>
 
-                <span class="label">Popup font size in percent</span>
-                <input type="number" data-disable-parent="openSiteOnIconClick" min="70" max="150" data-option-name="popupFontSize" /><br>
+                <label for="popupFontSize" class="label">Popup font size in percent</label>
+                <input id="popupFontSize" type="number" data-disable-parent="openSiteOnIconClick" min="70" max="150" data-option-name="popupFontSize" /><br>
 
-                <span class="label">Popup width</span>
-                <input type="number" data-disable-parent="openSiteOnIconClick" min="380" max="2000" data-option-name="popupWidth" /><br>
+                <label for="popupWidth" class="label">Popup width</label>
+                <input id="popupWidth" type="number" data-disable-parent="openSiteOnIconClick" min="380" max="2000" data-option-name="popupWidth" /><br>
 
-                <span class="label">Expanded popup width</span>
-                <input type="number" data-disable-parent="openSiteOnIconClick" min="380" max="2000" data-option-name="expandedPopupWidth" /><br>
+                <label for="expandedPopupWidth" class="label">Expanded popup width</label>
+                <input id="expandedPopupWidth" type="number" data-disable-parent="openSiteOnIconClick" min="380" max="2000" data-option-name="expandedPopupWidth" /><br>
 
-                <span class="label">Show full content of article in the expanded feed (if possible)</span>
-                <input type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="showFullFeedContent" /><br>
+                <label for="showFullFeedContent" class="label">Show full content of article in the expanded feed (if possible)</label>
+                <input id="showFullFeedContent" type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="showFullFeedContent" /><br>
 
-                <span class="label">Show categories in popup</span>
-                <input type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="showCategories" /><br>
+                <label for="showCategories" class="label">Show categories in popup</label>
+                <input id="showCategories" type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="showCategories" /><br>
 
-                <span class="label">Force update feeds on popup open</span>
-                <input type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="forceUpdateFeeds" /><br>
+                <label for="forceUpdateFeeds" class="label">Force update feeds on popup open</label>
+                <input id="forceUpdateFeeds" type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="forceUpdateFeeds" /><br>
 
-                <span class="label">Open feeds in the same tab</span>
-                <input type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="openFeedsInSameTab" /><br>
+                <label for="openFeedsInSameTab" class="label">Open feeds in the same tab</label>
+                <input id="openFeedsInSameTab" type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="openFeedsInSameTab" /><br>
 
-                <span class="label">Expand all feeds when popup is opened</span>
-                <input type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="expandFeeds" /><br>
+                <label for="expandFeeds" class="label">Expand all feeds when popup is opened</label>
+                <input id="expandFeeds" type="checkbox" data-disable-parent="openSiteOnIconClick" data-option-name="expandFeeds" /><br>
 
                 <h3 data-locale-value="Notifications"></h3>
-                <span class="label">Show desktop notifications</span>
-                <input type="checkbox" data-option-name="showDesktopNotifications" /><br>
+                <label for="showDesktopNotifications" class="label">Show desktop notifications</label>
+                <input id="showDesktopNotifications" type="checkbox" data-option-name="showDesktopNotifications" /><br>
 
                 <div id="filters-settings">
                     <h3>Filters</h3>
-                    <span class="label">Update only following categories</span>
-                    <input type="checkbox" data-option-name="isFiltersEnabled" /><br>
+                    <label for="isFiltersEnabled" class="label">Update only following categories</label>
+                    <input id="isFiltersEnabled" type="checkbox" data-option-name="isFiltersEnabled" /><br>
                     <fieldset data-enable-parent="isFiltersEnabled" id="categories">
                         <legend>Categories</legend>
                     </fieldset>
