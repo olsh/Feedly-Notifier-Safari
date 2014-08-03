@@ -2,6 +2,7 @@
 
 var appGlobal = {
     feedlyApiClient: new FeedlyApiClient(),
+    feedTab: null,
     icons: {
         default: "images/icon.png",
         inactive: "images/icon_inactive.png",
@@ -23,6 +24,7 @@ var appGlobal = {
         useSecureConnection: true,
         expandFeeds: false,
         isFiltersEnabled: false,
+        openFeedsInSameTab: false,
         filters: [],
         showCounter: true,
         oldestFeedsFirst: false,
@@ -178,10 +180,18 @@ function sendDesktopNotification(feeds) {
 }
 
 /* Opens new tab */
-function openUrlInNewTab(url, active) {
+function openUrlInNewTab(url, active, isFeed) {
     var visibility = active ? "foreground" : "background";
     var tab = safari.application.activeBrowserWindow.openTab(visibility);
     tab.url = url;
+
+    if (isFeed) {
+        appGlobal.feedTab = tab;
+
+        tab.addEventListener("close", function() {
+            appGlobal.feedTab = null;
+        }, false);
+    }
 }
 
 /* Opens new Feedly tab, if tab was already opened, then switches on it and reload. */

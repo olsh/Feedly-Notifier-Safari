@@ -16,9 +16,17 @@ $("#login").click(function () {
 $("#feed, #feed-saved").on("mousedown", "a", function (event) {
     var link = $(this);
     if (event.which === 1 || event.which === 2) {
-        var isActive = !(event.ctrlKey || event.which === 2);
-        popupGlobal.backgroundPage.openUrlInNewTab(link.data("link"), isActive);
-        if (popupGlobal.backgroundPage.appGlobal.options.markReadOnClick && link.hasClass("title") && $("#feed").is(":visible")) {
+        var isActiveTab = !(event.ctrlKey || event.which === 2);
+        var isFeed = link.hasClass("title") && $("#feed").is(":visible");
+        var url = link.data("link");
+
+        if (isFeed && popupGlobal.backgroundPage.appGlobal.feedTab && popupGlobal.backgroundPage.appGlobal.options.openFeedsInSameTab) {
+            popupGlobal.backgroundPage.appGlobal.feedTab.url = url;
+        } else {
+            popupGlobal.backgroundPage.openUrlInNewTab(url, isActiveTab, isFeed);
+        }
+
+        if (popupGlobal.backgroundPage.appGlobal.options.markReadOnClick) {
             markAsRead([link.closest(".item").data("id")]);
         }
     }
