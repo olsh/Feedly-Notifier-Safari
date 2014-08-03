@@ -59,16 +59,12 @@ $("#popup-content").on("click", ".show-content", function () {
     var contentContainer = feed.find(".content");
     var feedId = feed.data("id");
     if (contentContainer.html() === "") {
-        var content;
         var feeds = $("#feed").is(":visible") ? popupGlobal.feeds : popupGlobal.savedFeeds;
 
         for (var i = 0; i < feeds.length; i++) {
             if (feeds[i].id === feedId) {
-                content = feeds[i].content
-            }
-        }
-        if (content) {
-            contentContainer.html(content);
+                contentContainer.html($("#feed-content").mustache(feeds[i]));
+
             //For open new tab without closing popup
             contentContainer.find("a").each(function (key, value) {
                 var link = $(value);
@@ -76,6 +72,7 @@ $("#popup-content").on("click", ".show-content", function () {
                 link.attr("href", "javascript:void(0)");
             });
         }
+    }
     }
     contentContainer.slideToggle(function () {
         $this.css("background-position", contentContainer.is(":visible") ? "-288px -120px" : "-313px -119px");
