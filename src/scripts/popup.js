@@ -74,9 +74,9 @@ $("#popup-content").on("click", ".show-content", function () {
         }
     }
     }
-    contentContainer.slideToggle(function () {
+    contentContainer.slideToggle("fast", function () {
         $this.css("background-position", contentContainer.is(":visible") ? "-288px -120px" : "-313px -119px");
-        if (contentContainer.is(":visible") && contentContainer.text().length > 350) {
+        if ($(".content").is(":visible")) {
             setPopupExpand(true);
         } else {
             setPopupExpand(false);
@@ -155,8 +155,17 @@ function renderFeeds(forceUpdate) {
                     renderCategories(container, feeds);
                 }
 
-                container.append($("#feedTemplate").mustache({feeds: feeds}));
+                if (popupGlobal.backgroundPage.appGlobal.options.expandFeeds) {
+                    var partials = { content: $("#feed-content").html() };
+                }
+
+                container.append($("#feedTemplate").mustache({feeds: feeds}, partials));
                 container.find(".timeago").timeago();
+
+                if (popupGlobal.backgroundPage.appGlobal.options.expandFeeds) {
+                    container.find(".show-content").click();
+                }
+
                 showFeeds();
             }
         }
@@ -175,12 +184,21 @@ function renderSavedFeeds(forceUpdate) {
             } else {
                 var container = $("#feed-saved").empty();
 
+                if (popupGlobal.backgroundPage.appGlobal.options.expandFeeds) {
+                    var partials = { content: $("#feed-content").html() };
+                }
+
                 if (popupGlobal.backgroundPage.appGlobal.options.showCategories) {
                     renderCategories(container, feeds);
                 }
 
-                container.append($("#feedTemplate").mustache({feeds: feeds}));
+                container.append($("#feedTemplate").mustache({feeds: feeds}, partials));
                 container.find(".timeago").timeago();
+
+                if (popupGlobal.backgroundPage.appGlobal.options.expandFeeds) {
+                    container.find(".show-content").click();
+                }
+
                 showSavedFeeds();
             }
         }
